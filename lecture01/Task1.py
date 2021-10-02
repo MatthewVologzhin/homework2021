@@ -1,8 +1,25 @@
+#Добавленные модули
 import math as m
-a=float(input("Введите длину стороны A: "))
-b=float(input("Введите длину стороны B: "))
-d=float(input("Введите угол между сторонами A и B: "))
-e=m.cos(m.radians(float(d)))
-c=m.sqrt(float(a)**2+float(b)**2-2*float(b)*float(a)*float(e))
-print("Сторона C равна: ", c)
-input()
+
+#Задание переменных
+print("Введите длину стороны A:")
+a=input()
+
+print("Введите длину стороны B:")
+b=input()
+
+print("Введите угол между A и B:")
+angle=input()
+
+#Программа
+if str.isdigit(a) and str.isdigit(b) and str.isdigit(angle):
+
+    a=int(a)
+    b=int(b)
+    angle=int(angle)
+    c=m.sqrt(a**2+b**2-2*a*b*m.cos(m.radians(angle)))
+    print("Длина третьей стороны:",c)
+
+else:
+    print("Ошибка! Введите правильные числа.")
+        
