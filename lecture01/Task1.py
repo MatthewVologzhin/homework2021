@@ -22,4 +22,6 @@ if str.isdigit(a) and str.isdigit(b) and str.isdigit(angle):
 
 else:
     print("Ошибка! Введите правильные числа.")
+input()
+
         
