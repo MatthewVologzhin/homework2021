@@ -61,8 +61,8 @@ Score2 = []
 Chance = []
 for e in range(N, N*M+1):
     Score2.append(Score.count(e))
-    print (e, '=', Score2[e-N]/Variations, '%')
+    print (e, '=', 100*Score2[e-N]/Variations, '%')
     Chance.append(Score2[e-N]/Variations)    
-print('Сумма вероятностей:', sum(Chance))
+print('Сумма вероятностей:', 100*sum(Chance), '%')
 input()
 exit()
