@@ -3,52 +3,43 @@ import itertools as it
 # Проверка числа на соблдюение условий
 while True:
     try:
-        NumbList = input('Введите строку типа "NdM NdM":')
+
+        NumbList = input('Введите строку типа "NdM", вводя через пробел\
+все необходимые строки такого типа:')
+        print('')
+
         Z = NumbList.count('d')
         NumbList = NumbList.split()
         NumbList2 = []
+
         for h in range(len(NumbList)):
             NumbList2 += NumbList[h].split('d')
-        print(NumbList2)
         for i in range(len(NumbList2)):
             if int(NumbList2[i]) == 0:
                 raise ValueError
         break
-    except ValueError or IndexError or ZeroDi:
+
+    except ValueError or IndexError:
         print('Вы ввели некорректное число! Попробуйте ещё раз:')
 
 # Функция
-def def1(N,M):
+def Probabilities(N,M):
 
 # Количество вариантов событий
     N = int(N)
     M = int(M)
     Variations = M**N
-    print("Всего вариантов выпадения:", Variations)
+    print('\033[31m\033[03m{}\033[00m'.format("Всего вариантов выпадения:", Variations))
 
 
 # Список чисел, которые могут участвовать в перестановке
     Value = []
     for a in range(1,M+1):
-        for b in range(1, N+1):
-            Value.append(a)
+        Value.append(a)
 
 # Список ВСЕХ перестановок
-    X = list(it.permutations(Value, N))
+    X = list(it.product(Value, repeat = N))
 
-# Отбор НУЖНЫХ перестановок по условию
-    TF = 1
-    while TF:
-        try:
-            for c in range(len(X)):
-                if X.count(X[c])>1:
-                    X.remove(X[c])
-                elif len(X)== Variations:
-                    TF = False
-                else:
-                    continue
-        except IndexError:
-            continue
 
 # Список сумм каждой перестановки
     Score = []
@@ -65,11 +56,11 @@ def def1(N,M):
         Chance.append(Score2[e-N]/Variations)
         for g in (Score, Score2, Value, N, M, Variations, X):
             del g
-    return print('Сумма вероятностей:', 100*sum(Chance), '%')
+    return print('Сумма вероятностей:', round(100*sum(Chance), 3), '%', '\n')
 
 # Вся оставшаяся программа без функции :D
-for f in range(0,len(NumbList2),2):
-    def1(NumbList2[f], NumbList2[f+1])
+for f in range(0,2*Z,2):
+    Probabilities(NumbList2[f], NumbList2[f+1])
 
 
 

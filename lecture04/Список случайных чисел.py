@@ -34,3 +34,6 @@ while True:
     break
 print('\033[01m'.format(),"Список", N,"случайных чисел:",'\033[0m'.format())
 print(RandomList)
+
+input()
+exit()
