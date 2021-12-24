@@ -217,33 +217,52 @@ class MainWindow(QWidget):
 
 #Класс объектов теста
     class QuestionWidget(QWidget):
-        def __init__(self):
+        def __init__(self,direct):
             super().__init__()
+            self.direct = direct
             self.Main()
-
+            
         def Main(self):
-
             self.font = QtGui.QFont()
             self.font.setFamily('Calibri')
             self.font.setPointSize(16)
             self.font.setWeight(0)
-
+            fontAns = QtGui.QFont()
+            fontAns.setFamily('Calibri')
+            fontAns.setPointSize(13)
+            fontAns.setWeight(0)
+            
             numb = r.randint(1,2)
-            direct = 'spina'
             self.testPict = QLabel()
-            pict = QPixmap('Pictures and Gif/test_pictures/%s/%d.png' % (direct,numb))
+            pict = QPixmap('Pictures and Gif/test_pictures/%s/%d.png' % (self.direct,numb))
             self.testPict.setPixmap(pict)
+            with open('Questions and Answers/%s/%d.txt' % (self.direct,numb)) as testText:
+                QuestionNumber = ''
+                HWLines = 0
+                ListOfQuestion = []
+                for lines in testText:
+                    HWLines = HWLines + 1
+                    lines1 = lines.split('.')
+                    ListOfQuestion.append(lines1[0])
+                QuestionNumber = ListOfQuestion[r.randint(0,HWLines-1)]
+                    
 
+            Question = QLabel()
+            Question.setText('Введите %s-ое название:' % (QuestionNumber))
+            Question.setFont(self.font)
+            Question.setStyleSheet('QLabel {color: white}')
             btnNext = QPushButton('Принять')
             btnSkip = QPushButton('Пропустить')
             btnNext.setFixedSize(140,40)
             btnSkip.setFixedSize(140,40)
             btnNext.setFont(self.font)
             btnSkip.setFont(self.font)
+            btnNext.clicked.connect(self.Next)
             AnsLine = QLineEdit()
+            AnsLine.setFont(fontAns)
             AnsLine.setFixedSize(250,40)
 
-
+            hboxQuestion = QHBoxLayout()
             hboxPict = QHBoxLayout()
             hboxBtn = QHBoxLayout()
             hboxLine = QHBoxLayout()
@@ -252,6 +271,9 @@ class MainWindow(QWidget):
             hboxPict.addStretch(1)
             hboxPict.addWidget(self.testPict)
             hboxPict.addStretch(1)
+            hboxQuestion.addStretch(1)
+            hboxQuestion.addWidget(Question)
+            hboxQuestion.addStretch(1)
             hboxLine.addStretch(1)
             hboxLine.addWidget(AnsLine)
             hboxLine.addStretch(1)
@@ -260,14 +282,20 @@ class MainWindow(QWidget):
             hboxBtn.addStretch(1)
             hboxBtn.addWidget(btnSkip)
             hboxBtn.addStretch(30)
-            vboxF.addStretch(10)
+            vboxF.addStretch(20)
             vboxF.addLayout(hboxPict)
+            vboxF.addStretch(2)
+            vboxF.addLayout(hboxQuestion)
             vboxF.addStretch(1)
             vboxF.addLayout(hboxLine)
-            vboxF.addStretch(1)
+            vboxF.addStretch(2)
             vboxF.addLayout(hboxBtn)
-            vboxF.addStretch(10)
+            vboxF.addStretch(20)
             self.gridTest.addLayout(vboxF,0,0)
+        def Next(self):
+            for i in reversed(range(self.gridTest.count())):
+                gridTest.itemAt(i).widget().setParent(None)
+            
 
 
             
@@ -282,11 +310,8 @@ class MainWindow(QWidget):
         self.btnBack.hide()
         for i in range(7):
             self.ListMyology[2*i].hide()
-        SpinaTest = self.QuestionWidget()
+        SpinaTest = self.QuestionWidget('spina')
         self.gridMain.addLayout(SpinaTest.gridTest,0,0)
-
-
-        
 
 
 #Запуск приложения
