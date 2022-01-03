@@ -1,0 +1,15 @@
+2) M. temporalis
+5) M. pterygoideus lateralis
+6) M. pterygoideus medianus
+7) M. styloglossus
+8) M. stylohyoideus
+9) M. digastricus
+10) M. masseter
+11) Mandibula
+12) M. sternocleidomastoideus
+13) M. orbicularis oculi
+14) M. orbicularis oris
+15) M. buccinator
+16) M. depressor anguli oris
+17) M. depressor labi inferioris
+18) Platisma

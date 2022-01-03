@@ -1,13 +1,11 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import (QWidget, QPushButton,
-                             QHBoxLayout, QVBoxLayout, QApplication,
-                             QGridLayout, QLabel, QLineEdit)
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import (QPixmap)
 from use_gif import use_gif
 import sys
 import sip
 import random as r
-class MainWindow(QWidget):
+class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
@@ -44,11 +42,12 @@ class MainWindow(QWidget):
         self.btnStart.setFixedSize(400,50)
         self.btnStart.setFont(self.font)
         self.btnStart.clicked.connect(self.Start)
+
         #Создание кнопки "Сменить тему"
-        #self.btnChangeTheme = QPushButton("Изменить тему")
-        #self.btnChangeTheme.setFixedSize(200,50)
-        #self.btnChangeTheme.setFont(self.font)
-        #self.btnChangeTheme.clicked.connect(self.ChangeTheme)
+        self.btnChangeTheme = QPushButton("Изменить тему")
+        self.btnChangeTheme.setFixedSize(200,50)
+        self.btnChangeTheme.setFont(self.font)
+        self.btnChangeTheme.clicked.connect(self.ChangeTheme)
 
         #Создание заставки
         self.mainPict = QLabel()
@@ -65,6 +64,7 @@ class MainWindow(QWidget):
         vboxMAIN = QVBoxLayout()
         hboxMAIN = QHBoxLayout()
         gridBack = QGridLayout()
+        mainWidget = QWidget()
 
         hbox.addStretch(4)
         hbox.addWidget(self.btnStart)
@@ -82,10 +82,10 @@ class MainWindow(QWidget):
         hboxMAIN.addLayout(vboxMAIN)
         hboxMAIN.addStretch(1)
 
-        #vboxChange.addWidget(self.btnChangeTheme)
-        #vboxChange.addStretch(1)
-        #hboxChange.addStretch(1)
-        #hboxChange.addLayout(vboxChange)
+        vboxChange.addWidget(self.btnChangeTheme)
+        vboxChange.addStretch(1)
+        hboxChange.addStretch(1)
+        hboxChange.addLayout(vboxChange)
 
         gridButStart.setSpacing(10)
         gridButStart.addLayout(vbox,0,0)
@@ -97,8 +97,9 @@ class MainWindow(QWidget):
         
         self.gridMain.addLayout(gridBack,0,0)
         self.gridMain.addLayout(gridButStart,0,0)
+        mainWidget.setLayout(self.gridMain)
+        self.setCentralWidget(mainWidget)
 
-        self.setLayout(self.gridMain)
 
     #Функционал кнопки "Старт"
     def Start(self):
@@ -153,7 +154,6 @@ class MainWindow(QWidget):
         self.gridMain.addLayout(vbox,0,0)
         self.gridMain.addLayout(hboxBack,0,0)
 
-        self.setLayout(self.gridMain)
 
     #Смена темы. В разработке.
     def ChangeTheme(self, howManyClick = 0):
@@ -212,17 +212,73 @@ class MainWindow(QWidget):
         vbox.addStretch(1)
 
         self.gridMain.addLayout(vbox,0,0)
-        self.setLayout(self.gridMain)
 
+    def HWQuestions(self):
+        QuestWind = QMessageBox()
+        QuestWind.setText('Сколько вопросов будет в тесте:')
+        QuestWind.exec_()
+    
+    #Функционал кнопки "Спина"
+    def Spina(self):
+        self.spinaWidget = QWidget()
+        self.HWQuestions()
+        self.btnBack.hide()
+        self.btnChangeTheme.hide()
+        for i in range(7):
+            self.ListMyology[2*i].hide()
+            
+        self.SpinaTest = QuestionWidget('spina')
+        self.counter = 1
+        self.gridMain.addWidget(self.SpinaTest,0,0)
+        self.spinaWidget.setLayout(self.gridMain)
+        self.setCentralWidget(self.spinaWidget)
+
+        self.SpinaTest.btnNext.clicked.connect(self.Next)
+
+    def Next(self):
+
+        if self.counter >= 13:
+            self.w = FinalWindow()
+            self.w.show()
+            self.SpinaTest.setParent(None)
+            
+        else:
+            newWidget = QuestionWidget('spina')
+            self.gridMain.replaceWidget(self.SpinaTest, newWidget)
+            self.SpinaTest.setParent(None)
+            self.SpinaTest = newWidget
+            self.SpinaTest.btnNext.clicked.connect(self.Next)
+            self.counter = self.counter + 1
+            print(self.counter)
+
+
+#Окно с результатом
+class FinalWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(400,200)
+        self.setWindowTitle('Результат')
+        result = QLabel()
+        hbox = QHBoxLayout()
+        widget = QWidget()
+        
+        result.setText('Ваш результат:')
+        hbox.addStretch(1)
+        hbox.addWidget(result)
+        hbox.addStretch(1)
+        widget.setLayout(hbox)
+        
+        self.setCentralWidget(widget)
+        
+        
+            
 
 #Класс объектов теста
-    class QuestionWidget(QWidget):
-        def __init__(self,direct):
-            super().__init__()
+class QuestionWidget(QWidget):
+    def __init__(self,direct,parent = None):
+            super().__init__(parent=parent)
             self.direct = direct
-            self.Main()
             
-        def Main(self):
             self.font = QtGui.QFont()
             self.font.setFamily('Calibri')
             self.font.setPointSize(16)
@@ -232,91 +288,74 @@ class MainWindow(QWidget):
             fontAns.setPointSize(13)
             fontAns.setWeight(0)
             
-            numb = r.randint(1,2)
+            self.numb = r.randint(1,14)
             self.testPict = QLabel()
-            pict = QPixmap('Pictures and Gif/test_pictures/%s/%d.png' % (self.direct,numb))
+            pict = QPixmap('Pictures and Gif/test_pictures/%s/%d.png' % (self.direct,self.numb))
             self.testPict.setPixmap(pict)
-            with open('Questions and Answers/%s/%d.txt' % (self.direct,numb)) as testText:
+            with open('Questions and Answers/%s/%d.txt' % (self.direct,self.numb)) as testText:
                 QuestionNumber = ''
                 HWLines = 0
-                ListOfQuestion = []
+                NumbOfQuestions = []
+                ListOfAnswers = []
                 for lines in testText:
                     HWLines = HWLines + 1
-                    lines1 = lines.split('.')
-                    ListOfQuestion.append(lines1[0])
-                QuestionNumber = ListOfQuestion[r.randint(0,HWLines-1)]
+                    lines1 = lines.split(')')
+                    NumbOfQuestions.append(lines1[0])
+                    ListOfAnswers.append(lines1[1])
                     
+                QuestionNumber = NumbOfQuestions[r.randint(0,HWLines-1)]
 
+            self.testWidget = QWidget()
             Question = QLabel()
-            Question.setText('Введите %s-ое название:' % (QuestionNumber))
+            Question.setText('Введите название %s:' % (QuestionNumber))
             Question.setFont(self.font)
             Question.setStyleSheet('QLabel {color: white}')
-            btnNext = QPushButton('Принять')
+            self.btnNext = QPushButton('Принять')
+            self.btnNext.setFixedSize(140,40)
+            self.btnNext.setFont(self.font)
             btnSkip = QPushButton('Пропустить')
-            btnNext.setFixedSize(140,40)
             btnSkip.setFixedSize(140,40)
-            btnNext.setFont(self.font)
             btnSkip.setFont(self.font)
-            btnNext.clicked.connect(self.Next)
             AnsLine = QLineEdit()
             AnsLine.setFont(fontAns)
             AnsLine.setFixedSize(250,40)
 
-            hboxQuestion = QHBoxLayout()
-            hboxPict = QHBoxLayout()
-            hboxBtn = QHBoxLayout()
-            hboxLine = QHBoxLayout()
-            vboxF = QVBoxLayout()
-            self.gridTest = QGridLayout()
-            hboxPict.addStretch(1)
-            hboxPict.addWidget(self.testPict)
-            hboxPict.addStretch(1)
-            hboxQuestion.addStretch(1)
-            hboxQuestion.addWidget(Question)
-            hboxQuestion.addStretch(1)
-            hboxLine.addStretch(1)
-            hboxLine.addWidget(AnsLine)
-            hboxLine.addStretch(1)
-            hboxBtn.addStretch(30)
-            hboxBtn.addWidget(btnNext)
-            hboxBtn.addStretch(1)
-            hboxBtn.addWidget(btnSkip)
-            hboxBtn.addStretch(30)
-            vboxF.addStretch(20)
-            vboxF.addLayout(hboxPict)
-            vboxF.addStretch(2)
-            vboxF.addLayout(hboxQuestion)
-            vboxF.addStretch(1)
-            vboxF.addLayout(hboxLine)
-            vboxF.addStretch(2)
-            vboxF.addLayout(hboxBtn)
-            vboxF.addStretch(20)
-            self.gridTest.addLayout(vboxF,0,0)
-        def Next(self):
-            for i in reversed(range(self.gridTest.count())):
-                gridTest.itemAt(i).widget().setParent(None)
-            
+            grid = QGridLayout()
+            hbox = QHBoxLayout()
+            vbox = QVBoxLayout()
+            hbox2 = QHBoxLayout()
+            hbox1 = QHBoxLayout()
+            hbox3 = QHBoxLayout()
 
-
-            
-            
-            
-            
-
+            hbox.addStretch(1)
+            hbox.addWidget(self.testPict)
+            hbox.addStretch(1)
+            hbox1.addStretch(1)
+            hbox1.addWidget(Question)
+            hbox1.addStretch(1)
+            hbox2.addStretch(1)
+            hbox2.addWidget(AnsLine)
+            hbox2.addStretch(1)
+            hbox3.addStretch(10)
+            hbox3.addWidget(self.btnNext)
+            hbox3.addStretch(1)
+            hbox3.addWidget(btnSkip)
+            hbox3.addStretch(10)
+            vbox.addStretch(1)
+            vbox.addLayout(hbox)
+            vbox.addLayout(hbox1)
+            vbox.addLayout(hbox2)
+            vbox.addLayout(hbox3)
+            vbox.addStretch(1)
+            self.setLayout(vbox)
         
 
-    #Функционал кнопки "Спина"
-    def Spina(self):
-        self.btnBack.hide()
-        for i in range(7):
-            self.ListMyology[2*i].hide()
-        SpinaTest = self.QuestionWidget('spina')
-        self.gridMain.addLayout(SpinaTest.gridTest,0,0)
-
+    def __del__(self):
+            print('Deleted')
 
 #Запуск приложения
 if __name__ == '__main__':
-    App = QtWidgets.QApplication(sys.argv)
+    App = QApplication(sys.argv)
     mainWindow = MainWindow()
     #Отображаем окно
     mainWindow.show()
