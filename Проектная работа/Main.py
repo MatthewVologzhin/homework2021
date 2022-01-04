@@ -5,7 +5,8 @@ from use_gif import use_gif
 import sys
 import sip
 import random as r
-import datetime as t
+import time as t
+import datetime as dt
 import os
 class MainWindow(QMainWindow):
 
@@ -43,13 +44,14 @@ class MainWindow(QMainWindow):
         self.font = QtGui.QFont()
         self.font.setFamily('Calibri')
         self.font.setPointSize(16)
-        self.font.setWeight(0)
+        self.font.setBold(0)
 
         
         #Создание кнопки "Рекорды"
         self.btnRecords = QPushButton('Рекорды')
         self.btnRecords.setFixedSize(250,50)
         self.btnRecords.setFont(self.font)
+        self.btnRecords.clicked.connect(self.Records)
         #Создание кнопки "Старт"
         self.btnStart = QPushButton('Старт')
         self.btnStart.setFixedSize(400,50)
@@ -79,11 +81,11 @@ class MainWindow(QMainWindow):
         gridBack = QGridLayout()
         mainWidget = QWidget()
 
-        hbox.addStretch(4)
+        hbox.addStretch(10)
         hbox.addWidget(self.btnStart)
-        hbox.addStretch(2)
+        hbox.addStretch(1)
         hbox.addWidget(self.btnRecords)
-        hbox.addStretch(4)
+        hbox.addStretch(10)
         vbox.addStretch(20)
         vbox.addLayout(hbox)
         vbox.addStretch(1)
@@ -111,6 +113,10 @@ class MainWindow(QMainWindow):
         self.gridMain.addLayout(gridButStart,0,0)
         mainWidget.setLayout(self.gridMain)
         self.setCentralWidget(mainWidget)
+
+    def Records(self):
+        self.recordEx = Records_Widget()
+        self.recordEx.show()
 
 
     #Функционал кнопки "Старт"
@@ -255,7 +261,7 @@ class MainWindow(QMainWindow):
             self.trueCounter = self.trueCounter + 1    
 
         if self.counter >= int(self.NumbQuest):
-            self.w = FinalWindow(self.trueCounter, self.NumbQuest)
+            self.w = FinalWindow(self.trueCounter, self.NumbQuest,self.startTime)
             self.w.show()
             self.SpinaTest.setParent(None)
             self.btnMainWindow()
@@ -275,15 +281,22 @@ class MainWindow(QMainWindow):
         if self.NumbQuest.isdigit() == True:
             print(self.HMQ.line.text())
             self.HMQ.hide()
+            self.startTime = t.time()
             self.SpinaTest.Accepted()
 
 
 #Окно с результатом
 class FinalWindow(QMainWindow):
-    def __init__(self, trueCounter, NumbQuest):
+    def __init__(self, trueCounter, NumbQuest, startTime):
         super().__init__()
+
+        self.font = QtGui.QFont()
+        self.font.setFamily('Calibri')
+        self.font.setPointSize(13)
+        self.font.setBold(0)
+        
         self.setWindowIcon(QtGui.QIcon('Pictures and Gifs\AngPict.png'))
-        self.setFixedSize(400,200)
+        self.setFixedSize(500,200)
         ag = QDesktopWidget().availableGeometry()
         sg = QDesktopWidget().screenGeometry()
         widget = self.geometry()
@@ -295,15 +308,33 @@ class FinalWindow(QMainWindow):
         result = QLabel()
         hbox = QHBoxLayout()
         widget = QWidget()
-        
-        result.setText('Ваш результат: %s' % (trueCounter) + ' правильный ответ из ' + str(NumbQuest) +
-                       '\n' + str((int(trueCounter)/int(NumbQuest))) + '%')
+        result.setFont(self.font)
+        if list(str(trueCounter))[-1] == '1':
+            result.setText('Ваш результат: %s' % (trueCounter) + ' правильный ответ из ' + str(NumbQuest) +
+                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 3)) + '%')
+        elif list(str(trueCounter))[-1] == '0' or '5' or '6' or '7' or '8' or '9':
+            result.setText('Ваш результат: %s' % (trueCounter) + ' правильных ответов из ' + str(NumbQuest) +
+                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 3)) + '%')
+            
+        else:
+            result.setText('Ваш результат: %s' % (trueCounter) + ' правильных ответа из ' + str(NumbQuest) +
+                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 3)) + '%')
         hbox.addStretch(1)
         hbox.addWidget(result)
         hbox.addStretch(1)
         widget.setLayout(hbox)
         
         self.setCentralWidget(widget)
+        endTime = t.time()
+        time = endTime - startTime
+        print(dt.datetime.today())
+
+        with open('Results/result.txt', 'a') as fRecords:
+            fRecords.write(str(trueCounter) + '/' + str(NumbQuest) + '|'
+                           +  str(round((int(trueCounter)*100/int(NumbQuest)),3)) + '|' + str(round(time,2))
+                           + '|' + str(dt.datetime.today()) + '\n')
+        
+            
 
 
 
@@ -326,7 +357,7 @@ class QuestionWidget(QWidget):
             self.font = QtGui.QFont()
             self.font.setFamily('Calibri')
             self.font.setPointSize(16)
-            self.font.setWeight(0)
+            self.font.setBold(0)
             fontAns = QtGui.QFont()
             fontAns.setFamily('Calibri')
             fontAns.setPointSize(13)
@@ -340,6 +371,7 @@ class QuestionWidget(QWidget):
             self.AnsLine = QComboBox()
             self.AnsLine.setFont(fontAns)
             self.AnsLine.setFixedSize(400,40)
+            self.AnsLine.addItems([' '])
 
             with open('Questions and Answers/%s/%d.txt' % (self.direct,self.numb)) as testText:
                 QuestionNumber = ''
@@ -365,7 +397,7 @@ class QuestionWidget(QWidget):
 
             self.testWidget = QWidget()
             Question = QLabel()
-            Question.setText('Введите название %s:' % (self.QuestionNumber))
+            Question.setText('Выберите название %s:' % (self.QuestionNumber))
             Question.setFont(self.font)
             Question.setStyleSheet('QLabel {color: white}')
             self.btnNext.setFont(self.font)
@@ -409,7 +441,7 @@ class HMQuestions(QMainWindow):
         self.font = QtGui.QFont()
         self.font.setFamily('Calibri')
         self.font.setPointSize(13)
-        self.font.setWeight(0)
+        self.font.setBold(0)
         self.setFixedSize(300,140)
         self.setWindowTitle(' ')
 
@@ -461,7 +493,50 @@ class HMQuestions(QMainWindow):
         x = (ag.width() - widget.width())/2
         y = (2 * ag.height() - sg.height() - widget.height())/2
         self.move(x, y)
-    
+
+class Records_Widget(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        with open('Results/result.txt', 'r') as f:
+            self.hml1 = 0
+            lines = []
+            for line in f:
+                self.hml1 = self.hml1 + 1
+                line1 = line.replace('\n', '')
+                lines.append(line1.split('|'))
+
+            print(lines)
+                
+        self.setFixedSize(750,750)
+        self.setWindowTitle('Рекорды')
+        self.setWindowIcon(QtGui.QIcon('Pictures and Gifs\AngPict.png'))
+        table = QTableWidget()
+        table.setColumnCount(4)
+        table.setRowCount(self.hml1)
+
+        table.setHorizontalHeaderLabels(['Результат:', 'В процентах:', 'Время выполнения:', 'Дата:'])
+        table.horizontalHeaderItem(0).setTextAlignment(QtCore.Qt.AlignLeft)
+        table.horizontalHeaderItem(1).setTextAlignment(QtCore.Qt.AlignLeft)
+        table.horizontalHeaderItem(2).setTextAlignment(QtCore.Qt.AlignLeft)
+        table.horizontalHeaderItem(3).setTextAlignment(QtCore.Qt.AlignLeft)
+        
+        
+        for i in range(self.hml1):
+            table.setItem(i,0, QTableWidgetItem('%s' % lines[i][0]))
+            table.setItem(i,1, QTableWidgetItem('%s' % lines[i][1] + '%'))
+            table.setItem(i,2, QTableWidgetItem('%s сек.' % lines[i][2]))
+            table.setItem(i,3, QTableWidgetItem('%s' % lines[i][3]))
+            
+        table.resizeColumnsToContents()
+        print(dt.datetime.now())
+        widget = QWidget()
+        grid = QGridLayout()
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        
+        grid.addWidget(table,0,0)
+        widget.setLayout(grid)
+        self.setCentralWidget(widget)
         
         
 
