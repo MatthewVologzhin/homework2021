@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.hmcl = 2
+        self.hmcl = 4
         self.ListMyology = ['self.btnSpina', 'Спина и шея', 'self.btnUpper', 'Верхние конечности',
          'self.btnTaz', 'Мышцы таза', 'self.btnStupni', 'Ступни',
          'self.btnJivot', 'Грудь и живот', 'self.btnKist', 'Кисть', 'self.btnLower', 'Нижние конечости']
@@ -26,6 +26,8 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QtGui.QIcon('Pictures and Gifs\AngPict.png'))
         self.setFixedSize(1920,1000)
         self.btnMainWindow()
+        self.setStyleSheet("QPushButton {color: black; border-style: outset; border-width: 2px; border-color: rgb(0,0,0,0.5); background: qlineargradient(x1:0, y1:0, x2:1, y2:1,stop:0 white, stop: 0.4 rgb(244,244,244, 0.8), stop:1 gray); border-radius: 25px;}")
+
 
     def location_on_the_screen(self):
         ag = QDesktopWidget().availableGeometry()
@@ -37,7 +39,7 @@ class MainWindow(QMainWindow):
         self.move(x, y)
 
 
-    def btnMainWindow(self, howManyClick = 2):
+    def btnMainWindow(self, howManyClick = 4):
     #Создание кнопок начального окна
         self.i = 0
         #Задаём шрифт
@@ -46,6 +48,7 @@ class MainWindow(QMainWindow):
         self.font.setPointSize(16)
         self.font.setBold(0)
 
+        
         
         #Создание кнопки "Рекорды"
         self.btnRecords = QPushButton('Рекорды')
@@ -176,7 +179,7 @@ class MainWindow(QMainWindow):
 
     #Смена темы. В разработке.
     def ChangeTheme(self):
-        if self.hmcl != 10:
+        if self.hmcl != 7:
             self.hmcl = self.hmcl + 1
             self.btnMainWindow(self.hmcl)
         else:
@@ -311,14 +314,14 @@ class FinalWindow(QMainWindow):
         result.setFont(self.font)
         if list(str(trueCounter))[-1] == '1':
             result.setText('Ваш результат: %s' % (trueCounter) + ' правильный ответ из ' + str(NumbQuest) +
-                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 3)) + '%')
+                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 1)) + '%')
         elif list(str(trueCounter))[-1] == '0' or '5' or '6' or '7' or '8' or '9':
             result.setText('Ваш результат: %s' % (trueCounter) + ' правильных ответов из ' + str(NumbQuest) +
-                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 3)) + '%')
+                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 1)) + '%')
             
         else:
             result.setText('Ваш результат: %s' % (trueCounter) + ' правильных ответа из ' + str(NumbQuest) +
-                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 3)) + '%')
+                           '\n' + str(round((int(trueCounter)/int(NumbQuest))*100, 1)) + '%')
         hbox.addStretch(1)
         hbox.addWidget(result)
         hbox.addStretch(1)
@@ -332,7 +335,7 @@ class FinalWindow(QMainWindow):
         with open('Results/result.txt', 'a') as fRecords:
             fRecords.write(str(trueCounter) + '/' + str(NumbQuest) + '|'
                            +  str(round((int(trueCounter)*100/int(NumbQuest)),3)) + '|' + str(round(time,2))
-                           + '|' + str(dt.datetime.today()) + '\n')
+                           + '|' + str(dt.datetime.today().strftime("%d.%m.%Y %H:%M:%S")) + '\n')
         
             
 
@@ -349,9 +352,11 @@ class QuestionWidget(QWidget):
     def __init__(self,direct,parent = None):
             super().__init__(parent=parent)
             self.direct = direct
+            self.setStyleSheet("QPushButton {color: black; border-style: outset; border-width: 2px; border-color: rgb(0,0,0,0.5); background: qlineargradient(x1:0, y1:0, x2:1, y2:1,stop:0 white, stop: 0.4 rgb(244,244,244, 0.8), stop:1 gray); border-radius: 20px;}")
 
             self.btnNext = QPushButton('Принять')
-            self.btnNext.setFixedSize(200,40)
+            self.btnNext.setFixedSize(250,40)
+            
 
     def Accepted(self):
             self.font = QtGui.QFont()
@@ -437,6 +442,7 @@ class QuestionWidget(QWidget):
 class HMQuestions(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setStyleSheet("QPushButton {color: black; border-style: outset; border-width: 2px; border-color: rgb(0,0,0,0.5); background: qlineargradient(x1:0, y1:0, x2:1, y2:1,stop:0 white, stop: 0.4 rgb(244,244,244, 0.8), stop:1 gray); border-radius: 15px;} QLineEdit {border-radius: 15px;}")
         self.setWindowIcon(QtGui.QIcon('Pictures and Gifs\AngPict.png'))
         self.font = QtGui.QFont()
         self.font.setFamily('Calibri')
